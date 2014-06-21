@@ -3,7 +3,7 @@
   exception LexingError of string
 }
 
-let lambda = '\\'
+let lambda = ['\\' 'λ']
 let alpha = ['a' - 'z' 'A'- 'Z']
 let word = alpha+
 let empty = [' ' '\t' '\n']
