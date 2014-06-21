@@ -3,7 +3,6 @@
   exception LexingError of string
 }
 
-let lambda = ['\\' 'λ']
 let alpha = ['a' - 'z' 'A'- 'Z']
 let word = alpha+
 let empty = [' ' '\t' '\n']
@@ -16,7 +15,7 @@ rule lexer = parse
   | ')'                { TRPA         }
   | ';'                { TSep         }
   | ":="               { TAssign      }
-  | lambda             { TLambda      }
+  | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
   | word as w          { TWord w      }
   | _ as err           { raise (LexingError ("Unkown character \'" ^ Char.escaped err ^ "\'.\n")) }
