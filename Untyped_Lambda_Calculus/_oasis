@@ -1,0 +1,13 @@
+OASISFormat: 0.4
+Name:        Untyped Lambda Calculus
+Version:     0.9
+Synopsis:    An untyped lambda calculus (inspired by TAPL book)
+Authors:     Eyyüb (Eyyub) SARI
+License:     LGPL
+Plugins:     DevFiles (0.4)
+
+Executable ulc
+  Path:       .
+  BuildTools: ocamlbuild
+  MainIs:     src/main.ml
+  
