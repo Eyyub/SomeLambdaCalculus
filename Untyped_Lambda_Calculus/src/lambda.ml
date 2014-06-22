@@ -3,12 +3,26 @@ open Debruijn
 
 exception NoRuleApplies of term
 
-let rec print_term = function
-  | Var (v, x) -> Printf.printf "(Var [%s;%d])\n" v x
-  | Abs (x, t) -> Printf.printf "(Abs.%s " x; print_term t; print_string ")\n"
-  | App (t1, t2) -> Printf.printf "(App("; print_term t1; print_term t2; print_string ")\n"
-  | Assign (k, v) -> Printf.printf "(Assign(%s, " k; print_term v; print_string ")\n"
+let rec print_term_name = function
+  | Var (v, _) -> Printf.printf "(%s)" v
+  | Abs (x, t) -> Printf.printf "(λ%s." x; print_term_name t; print_string ")"
+  | App (t1, t2) -> Printf.printf "(("; print_term_name t1; print_term_name t2; print_string ")"
+  | Assign (k, v) -> Printf.printf "%s := " k; print_term_name v
 
+let rec print_term_index = function
+  | Var (_, x) -> Printf.printf "(%d)" x
+  | Abs (_, t) -> Printf.printf "(λ."; print_term_index t; print_string ")"
+  | App (t1, t2) -> Printf.printf "(("; print_term_index t1; print_term_index t2; print_string ")"
+  | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v
+
+let print_term t =
+  print_endline "Printing term with name :";
+  print_term_name t;
+  print_endline "\n=========End=============";
+  print_endline "Printing term with debruijn index :";
+  print_term_index t;
+  print_endline "\n=========End============="
+  
 let isval = function
   | Abs _ -> true
   | _ -> false
@@ -64,7 +78,11 @@ let rec eval l ctx =
   | [] -> ctx
   | Assign (k, v) :: xs -> eval xs (add_in_naming_context k (to_debruijn_term v ctx) ctx);
   | x :: xs -> 
+     print_endline "Before evaluation :";
      print_term (to_debruijn_term x ctx);
+     print_endline "===================";
+     print_endline "After evaluation ;";
      print_term (try eval' (to_debruijn_term x ctx) ctx 
                    with NoRuleApplies e -> e);
+     print_endline "===================";
      eval xs ctx
