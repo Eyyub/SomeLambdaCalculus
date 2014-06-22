@@ -23,8 +23,11 @@ let rec substitution j s t ctx =
     match t with
     | Var (z, k) ->
         if k > j then
-	  let t' = find_index k (succ j) ctx in
-	  shift 0 1 t'
+	  let t' = 
+	    (try
+		find_index k (succ j) ctx
+	      with Idx_Not_found _ -> failwith "Unknown name value") in
+	  shift 0 1 t';
 	else if j = k then s 
 	else t
     | Abs (x, t1) -> Abs (x, (substitution (succ j) (shift 0 1 s) t1 ctx))
