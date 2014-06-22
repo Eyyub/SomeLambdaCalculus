@@ -13,7 +13,7 @@ let add_in_naming_context k v ctx =
 let find_index k j ctx =
   try
     let (_, _, t') = 
-      List.find (fun (_, i, _) -> i = k - j - 1) ctx in (* n = k - j - 1 because : [0; length ctx[ *)
+      List.find (fun (_, i, _) -> i = k - j) ctx in
     t'
   with Not_found -> raise (Idx_Not_found k)
 

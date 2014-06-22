@@ -4,10 +4,10 @@ open Debruijn
 exception NoRuleApplies of term
 
 let rec print_term = function
-  | Var (v, x) -> Printf.printf "(Var [%s;%d])" v x
-  | Abs (x, t) -> Printf.printf "(Abs.%s " x; print_term t; print_string ")"
-  | App (t1, t2) -> Printf.printf "(App("; print_term t1; print_term t2; print_string ")"
-  | Assign (k, v) -> Printf.printf "(Assign(%s, " k; print_term v; print_string ")"
+  | Var (v, x) -> Printf.printf "(Var [%s;%d])\n" v x
+  | Abs (x, t) -> Printf.printf "(Abs.%s " x; print_term t; print_string ")\n"
+  | App (t1, t2) -> Printf.printf "(App("; print_term t1; print_term t2; print_string ")\n"
+  | Assign (k, v) -> Printf.printf "(Assign(%s, " k; print_term v; print_string ")\n"
 
 let isval = function
   | Abs _ -> true
@@ -21,9 +21,9 @@ let rec shift c d = function
 
 let rec substitution j s t ctx =
     match t with
-    | Var (_, k) ->
+    | Var (z, k) ->
         if k > j then
-	  let t' = find_index k j ctx in
+	  let t' = find_index k (succ j) ctx in
 	  shift 0 1 t'
 	else if j = k then s 
 	else t
@@ -37,6 +37,12 @@ let beta_reduction s t ctx =
   (shift 0 (-1) beta_redex)
 
 let rec eval' e ctx =
+  let e  = 
+    match e with
+    | App (Var (_, k), t2) -> App (find_index k 0 ctx, t2)
+    | App (t1, Var (_, k)) -> App (t1, find_index k 0 ctx)
+    | _ -> e
+  in
     match e with
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
@@ -45,13 +51,17 @@ let rec eval' e ctx =
 
 let rec print_context = function
   | [] -> print_string "End of ctx.\n"
-  | (k, idx, v) :: xs -> Printf.printf "k %s idx %d v : " k idx; print_term v; print_context xs
+  | (k, idx, v) :: xs -> 
+     Printf.printf "k %s idx %d v : " k idx; 
+     print_term v;
+     print_context xs
 
 let rec eval l ctx =
   match l with
   | [] -> ctx
   | Assign (k, v) :: xs -> eval xs (add_in_naming_context k (to_debruijn_term v ctx) ctx);
   | x :: xs -> 
-    print_term (try eval' (to_debruijn_term x ctx) ctx 
-                with NoRuleApplies e -> e);
-    eval xs ctx
+     print_term (to_debruijn_term x ctx);
+     print_term (try eval' (to_debruijn_term x ctx) ctx 
+                   with NoRuleApplies e -> e);
+     eval xs ctx
