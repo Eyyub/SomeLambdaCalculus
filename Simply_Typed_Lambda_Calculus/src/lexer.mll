@@ -19,6 +19,8 @@ rule lexer = parse
   | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
   | "Bool"             { TBool        }
+  | "true"             { TTrue        }
+  | "false"            { TFalse       }
   | "->"               { TArrow       }
   | word as w          { TWord w      }
   | _ as err           { raise (LexingError ("Unkown character \'" ^ Char.escaped err ^ "\'.\n")) }

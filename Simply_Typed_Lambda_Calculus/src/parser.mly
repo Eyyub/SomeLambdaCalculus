@@ -4,7 +4,7 @@
 
 %token TLambda (* λ or \ *)
 %token TDot (* . *)
-%token TBool (* Bool *)
+%token TBool TTrue TFalse (* Bool : true | false*)
 %token TArrow (* -> *)
 %token <string> TWord
 %token TSep (* ; *)
@@ -12,7 +12,7 @@
 %token TAssign (* := *)
 %token TLPA TRPA (* () *)
 %token TEof
-
+%right TArrow
 %start <TypedTerm.term list> prgm
 
 %%
@@ -25,10 +25,15 @@ sequence:
 | t = term TSep s = sequence { t :: s }
 
 term:
+| b   = bool_       { b   }
 | var = variable    { var }
 | abs = abstraction { abs }
 | app = application { app }
 | assign = assignation { assign }
+
+bool_:
+| TTrue  { TypedTerm.True  }
+| TFalse { TypedTerm.False }
 
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
