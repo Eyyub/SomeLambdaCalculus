@@ -4,6 +4,7 @@
 
 %token TLambda (* λ or \ *)
 %token TDot (* . *)
+%token TIf TThen TElse (* if <bool> then <T> else <T> *)
 %token TBool TTrue TFalse (* Bool : true | false*)
 %token TArrow (* -> *)
 %token <string> TWord
@@ -30,6 +31,7 @@ term:
 | var = variable    { var }
 | abs = abstraction { abs }
 | app = application { app }
+| if_ = ifthenelse  { if_ }
 | assign = assignation { assign }
 
 bool_:
@@ -49,6 +51,9 @@ type_:
 
 application:
 | TLPA t1 = term t2 = term TRPA { TypedTerm.App (t1, t2) }
+
+ifthenelse:
+| TLPA TIf cond = term TThen true_body = term TElse false_body = term TRPA { TypedTerm.If (cond, true_body, false_body) }
 
 assignation:
 | k = TWord TAssign v = term { TypedTerm.Assign (k, v) }

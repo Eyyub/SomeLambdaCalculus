@@ -37,5 +37,6 @@ let find_name_index name ctx =
     | Var (x, _) -> Var (x, depth - find_name_index x inner_ctx)
     | Abs (x, t) -> Abs (x, aux (succ depth) (x :: inner_ctx) t)
     | App (t1, t2) -> App (aux depth inner_ctx t1, aux depth inner_ctx t2)
+    | If (c, t, f) -> If (aux depth inner_ctx c, aux depth inner_ctx t, aux depth inner_ctx f)
     | Assign _ -> failwith "Assignation in expr."
   in aux 0 [] t

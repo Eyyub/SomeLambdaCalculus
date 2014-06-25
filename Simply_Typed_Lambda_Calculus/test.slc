@@ -1,0 +1,2 @@
+#((\x:Bool->Bool->Bool.x) (\y:Bool.(\w:Bool.(\a:Bool.false))));
+((\x:Bool.(if x then true else false)) false);

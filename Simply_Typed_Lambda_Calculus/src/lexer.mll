@@ -18,6 +18,9 @@ rule lexer = parse
   | ":="               { TAssign      }
   | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
+  | "if"               { TIf          }
+  | "then"             { TThen        }
+  | "else"             { TElse        }
   | "Bool"             { TBool        }
   | "true"             { TTrue        }
   | "false"            { TFalse       }

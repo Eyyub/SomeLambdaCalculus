@@ -9,6 +9,8 @@ let rec print_term_name = function
   | Var (v, _) -> Printf.printf "(%s)" v
   | Abs (x, t) -> Printf.printf "(λ%s." x; print_term_name t; print_string ")"
   | App (t1, t2) -> Printf.printf "(("; print_term_name t1; print_term_name t2; print_string ")"
+  | If (c, t, f) -> Printf.printf "(if "; print_term_name c; print_string " then "; 
+		    print_term_name t; print_string "else "; print_term_name f; print_string ")"
   | Assign (k, v) -> Printf.printf "%s := " k; print_term_name v
 
 let rec print_term_index = function
@@ -17,6 +19,8 @@ let rec print_term_index = function
   | Var (_, x) -> Printf.printf "(%d)" x
   | Abs (_, t) -> Printf.printf "(λ."; print_term_index t; print_string ")"
   | App (t1, t2) -> Printf.printf "(("; print_term_index t1; print_term_index t2; print_string ")"
+  | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
+		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
   | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v
 
 let print_term t =
@@ -37,6 +41,7 @@ let rec shift c d = function
   | Var (x, k) -> if k < c then Var (x, k) else Var (x, (k + d))
   | Abs (x, t) -> Abs (x, (shift (succ c) d t))
   | App (t1, t2) -> App (shift c d t1, shift c d t2)
+  | If (cond, t, f) -> If (shift c d cond, shift c d t, shift c d f)
   | Assign _ -> failwith "Assignation in expr.\n"
 
 let rec substitution j s t ctx =
@@ -52,6 +57,9 @@ let rec substitution j s t ctx =
 	else t
     | Abs (x, t1) -> Abs (x, (substitution (succ j) (shift 0 1 s) t1 ctx))
     | App (t1, t2) -> App (substitution j s t1 ctx, substitution j s t2 ctx)
+    | If (c, t', f) -> if substitution j s c ctx = True then 
+			 substitution j s t' ctx
+		       else substitution j s f ctx
     | Assign _ -> failwith "Assignation in expr.\n"
     | _ -> t
 
