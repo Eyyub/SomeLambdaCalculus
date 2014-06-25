@@ -1,0 +1,13 @@
+OASISFormat: 0.4
+Name:        slc
+Version:     0.1
+Synopsis:    A Simply Typed Lambda Calculus
+Authors:     Eyyüb (Eyyub) SARI
+License:     LGPL
+Plugins:     DevFiles (0.4)
+
+Executable slc
+  Path:       .
+  BuildTools: ocamlbuild
+  MainIs:     src/main.ml
+  

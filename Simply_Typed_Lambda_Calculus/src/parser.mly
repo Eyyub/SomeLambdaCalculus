@@ -13,7 +13,8 @@
 %token TLPA TRPA (* () *)
 %token TEof
 %right TArrow
-%start <TypedTerm.term list> prgm
+
+%start <TypedTerm.ty_term list> prgm
 
 %%
 
@@ -39,9 +40,10 @@ variable:
 | v = TWord { TypedTerm.Var (v, 0) }
 
 abstraction:
-| TLPA TLambda v = TWord TColon ty = type_  TDot t = term TRPA { TypedTerm.Abs ((v, ty), t) }
+| TLPA TLambda v = TWord TColon ty = type_ TDot t = term TRPA { TypedTerm.Abs ((v, ty), t) }
 
 type_:
+| TLPA ty = type_ TRPA { ty }
 | TBool { Type.Bool }
 | ty1 = type_ TArrow ty2 = type_ { Type.Arrow (ty1, ty2) }
 
