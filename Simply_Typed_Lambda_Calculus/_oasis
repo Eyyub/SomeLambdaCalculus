@@ -1,8 +1,8 @@
 OASISFormat: 0.4
 Name:        slc
 Version:     0.1
-Synopsis:    A Simply Typed Lambda Calculus
-Authors:     Eyyüb (Eyyub) SARI
+Synopsis:    A Simply Typed Lambda Calculus.
+Authors:     Eyyub (Eyyüb SARI)
 License:     LGPL
 Plugins:     DevFiles (0.4)
 

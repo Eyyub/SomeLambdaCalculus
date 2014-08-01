@@ -1,8 +1,8 @@
 OASISFormat: 0.4
-Name:        Untyped Lambda Calculus
-Version:     0.9
-Synopsis:    An untyped lambda calculus (inspired by TAPL book)
-Authors:     Eyyüb (Eyyub) SARI
+Name:        ulc
+Version:     0.1
+Synopsis:    A Untyped Lambda Calculus.
+Authors:     Eyyub (Eyyüb SARI)
 License:     LGPL
 Plugins:     DevFiles (0.4)
 
