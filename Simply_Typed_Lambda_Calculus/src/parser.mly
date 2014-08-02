@@ -6,6 +6,7 @@
 %token TDot (* . *)
 %token TIf TThen TElse (* if <bool> then <T> else <T> *)
 %token TBool TTrue TFalse (* Bool : true | false*)
+%token TTyUnit TValUnit (* Unit : unit *)
 %token TArrow (* -> *)
 %token <string> TWord
 %token TSep (* ; *)
@@ -28,6 +29,7 @@ sequence:
 
 term:
 | b   = bool_       { b   }
+| u   = unit_       { u   }
 | var = variable    { var }
 | abs = abstraction { abs }
 | app = application { app }
@@ -38,6 +40,9 @@ bool_:
 | TTrue  { TypedTerm.True  }
 | TFalse { TypedTerm.False }
 
+unit_:
+| TValUnit { TypedTerm.Unit }
+
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
 
@@ -46,8 +51,9 @@ abstraction:
 
 type_:
 | TLPA ty = type_ TRPA { ty }
-| TBool { Type.Bool }
-| ty1 = type_ TArrow ty2 = type_ { Type.Arrow (ty1, ty2) }
+| TBool { Type.TyBool }
+| TTyUnit { Type.TyUnit }
+| ty1 = type_ TArrow ty2 = type_ { Type.TyArrow (ty1, ty2) }
 
 application:
 | TLPA t1 = term t2 = term TRPA { TypedTerm.App (t1, t2) }

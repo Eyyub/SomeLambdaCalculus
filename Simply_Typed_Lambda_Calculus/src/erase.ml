@@ -1,6 +1,7 @@
 let rec erase = function
   | TypedTerm.True -> Term.True
   | TypedTerm.False -> Term.False
+  | TypedTerm.Unit -> Term.Unit
   | TypedTerm.Var (name, idx) -> Term.Var (name, idx)
   | TypedTerm.Abs ((x, _), t) -> Term.Abs (x, erase t)
   | TypedTerm.App (t1, t2) -> Term.App (erase t1, erase t2)

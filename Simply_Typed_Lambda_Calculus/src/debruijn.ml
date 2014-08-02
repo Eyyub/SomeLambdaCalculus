@@ -31,6 +31,7 @@ let find_name_index name ctx =
   let rec aux depth inner_ctx = function
     | True -> True
     | False -> False
+    | Unit -> Unit
     | Var (x, _) when List.exists (fun (a, _, _) -> a = x) ctx ->
                     let (_, idx, _) = List.find (fun (a, _, _) -> a = x) ctx in 
 		    Var (x, depth + idx)

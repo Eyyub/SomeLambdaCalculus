@@ -24,6 +24,8 @@ rule lexer = parse
   | "Bool"             { TBool        }
   | "true"             { TTrue        }
   | "false"            { TFalse       }
+  | "Unit"             { TTyUnit      }
+  | "unit"             { TValUnit     }
   | "->"               { TArrow       }
   | word as w          { TWord w      }
   | _ as err           { raise (LexingError ("Unkown character \'" ^ Char.escaped err ^ "\'.\n")) }

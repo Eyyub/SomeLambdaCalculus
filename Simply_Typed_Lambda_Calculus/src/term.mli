@@ -1,6 +1,7 @@
 type term =
   | True
   | False
+  | Unit
   | Var    of (string * int)
   | Abs    of (string * term)
   | App    of term * term

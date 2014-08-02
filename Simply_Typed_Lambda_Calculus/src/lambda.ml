@@ -6,6 +6,7 @@ exception NoRuleApplies of term
 let rec print_term_name = function
   | True -> Printf.printf "(true)"
   | False -> Printf.printf "(false)"
+  | Unit -> Printf.printf "(unit)"
   | Var (v, _) -> Printf.printf "(%s)" v
   | Abs (x, t) -> Printf.printf "(λ%s." x; print_term_name t; print_string ")"
   | App (t1, t2) -> Printf.printf "(("; print_term_name t1; print_term_name t2; print_string ")"
@@ -16,6 +17,7 @@ let rec print_term_name = function
 let rec print_term_index = function
   | True -> Printf.printf "(true)"
   | False -> Printf.printf "(false)"
+  | Unit -> Printf.printf "(unit)"
   | Var (_, x) -> Printf.printf "(%d)" x
   | Abs (_, t) -> Printf.printf "(λ."; print_term_index t; print_string ")"
   | App (t1, t2) -> Printf.printf "(("; print_term_index t1; print_term_index t2; print_string ")"
@@ -32,12 +34,13 @@ let print_term t =
   print_endline "\n=========End============="
   
 let isval = function
-  | Abs _ | True | False -> true
+  | Abs _ | True | False | Unit -> true
   | _ -> false
 
 let rec shift c d = function
   | True -> True
   | False -> False
+  | Unit -> Unit
   | Var (x, k) -> if k < c then Var (x, k) else Var (x, (k + d))
   | Abs (x, t) -> Abs (x, (shift (succ c) d t))
   | App (t1, t2) -> App (shift c d t1, shift c d t2)

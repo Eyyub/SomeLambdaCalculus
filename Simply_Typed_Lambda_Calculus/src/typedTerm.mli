@@ -5,6 +5,7 @@ exception TypingError of string
 type ty_term =
   | True
   | False
+  | Unit
   | Var    of string * int
   | Abs    of (string * ty) * ty_term
   | App    of ty_term * ty_term
