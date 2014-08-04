@@ -13,6 +13,7 @@ let rec print_term_name = function
   | If (c, t, f) -> Printf.printf "(if "; print_term_name c; print_string " then "; 
 		    print_term_name t; print_string "else "; print_term_name f; print_string ")"
   | Assign (k, v) -> Printf.printf "%s := " k; print_term_name v
+  | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_name t1; Printf.printf " ; "; print_term_name t2; Printf.printf ")"
 
 let rec print_term_index = function
   | True -> Printf.printf "(true)"
@@ -24,6 +25,7 @@ let rec print_term_index = function
   | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
 		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
   | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v
+  | Seq (t1, t2) -> Printf.printf "("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
 
 let print_term t =
   print_endline "Printing term with name :";
@@ -46,6 +48,7 @@ let rec shift c d = function
   | App (t1, t2) -> App (shift c d t1, shift c d t2)
   | If (cond, t, f) -> If (shift c d cond, shift c d t, shift c d f)
   | Assign _ -> failwith "Assignation in expr.\n"
+  | Seq (t1, t2) -> Seq (shift c d t1, shift c d t2)
 
 let rec substitution j s t ctx =
     match t with
@@ -64,6 +67,7 @@ let rec substitution j s t ctx =
 			 substitution j s t' ctx
 		       else substitution j s f ctx
     | Assign _ -> failwith "Assignation in expr.\n"
+    | Seq (t1, t2) -> Seq (substitution j s t1 ctx, substitution j s t2 ctx)
     | _ -> t
 
 let beta_reduction s t ctx =
@@ -82,7 +86,7 @@ let rec eval' e ctx =
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
-    | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
+    | _ -> (match e with Seq _ -> print_string "seq\n" | _ -> ()); raise (NoRuleApplies e) (* No Rule Applies *)
 
 let rec print_context = function
   | [] -> print_string "End of ctx.\n"

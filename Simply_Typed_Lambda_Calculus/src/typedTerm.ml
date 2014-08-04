@@ -11,6 +11,7 @@ type ty_term =
   | App    of ty_term * ty_term
   | If     of ty_term * ty_term * ty_term
   | Assign of string * ty_term
+  | Seq    of ty_term * ty_term
 
 let rec typeof ctx = function
   | True | False -> TyBool
@@ -33,6 +34,9 @@ let rec typeof ctx = function
 	else ty_t)
      else raise (TypingError "If condition must have type Bool.")
   | Assign _ -> failwith "Error : assign in expr. (typeof)"
+  | Seq (t1, t2) -> 
+    if typeof ctx t1 = TyUnit then typeof ctx t2
+    else raise (TypingError "Left seq side must have type unit.")
 
 let rec typecheck_ty_terms ctx = function
   | [] -> ()

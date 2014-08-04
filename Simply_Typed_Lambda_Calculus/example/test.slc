@@ -1,3 +1,5 @@
 #((\x:Bool->Bool->Bool.x) (\y:Bool.(\w:Bool.(\a:Bool.false)))); type mismatch
-((\x:Bool.(if x then true else false)) false);
-((\x:Unit.x) unit);
+#((\x:Bool.(if x then true else false)) false);
+#(((\x:Unit.x) (false) (unit)) unit);
+#(((\x:Bool.x) (unit) (false)) true)
+((\x:Unit. (unit) (true)) unit);

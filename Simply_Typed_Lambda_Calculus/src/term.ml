@@ -8,3 +8,4 @@ type term =
   | If     of term * term * term
   | Assign of string * term (* ugly ? when I match this pattern it looks like a hack,
 			       according to theory, assignation is not a valid term *)
+  | Seq    of term * term

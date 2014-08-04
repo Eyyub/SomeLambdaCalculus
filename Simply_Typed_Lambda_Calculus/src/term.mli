@@ -7,3 +7,4 @@ type term =
   | App    of term * term
   | If     of term * term * term
   | Assign of string * term
+  | Seq    of term * term

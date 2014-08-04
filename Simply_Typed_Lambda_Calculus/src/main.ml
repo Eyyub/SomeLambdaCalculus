@@ -4,6 +4,6 @@ let _ =
     (try TypedTerm.typecheck_ty_terms [] ty_e
      with TypedTerm.TypingError err -> Printf.printf "TypeError : %s\n" err; exit 1) in
   let e = Erase.erase_all ty_e in 
-  print_endline "Begin evaluation :";  
+  print_endline "Begin evaluation :";
   ignore (Lambda.eval e []);
   print_endline "End of evaluation."

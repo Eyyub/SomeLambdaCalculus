@@ -24,7 +24,7 @@ prgm:
 | s = sequence TEof { s }
 
 sequence:
-| t = term TSep { t :: [] }
+| t = term TSep { [t] }
 | t = term TSep s = sequence { t :: s }
 
 term:
@@ -47,7 +47,7 @@ variable:
 | v = TWord { TypedTerm.Var (v, 0) }
 
 abstraction:
-| TLPA TLambda v = TWord TColon ty = type_ TDot t = term TRPA { TypedTerm.Abs ((v, ty), t) }
+| TLPA TLambda v = TWord TColon ty = type_ TDot t = seq_ TRPA { TypedTerm.Abs ((v, ty), t) }
 
 type_:
 | TLPA ty = type_ TRPA { ty }
@@ -63,3 +63,9 @@ ifthenelse:
 
 assignation:
 | k = TWord TAssign v = term { TypedTerm.Assign (k, v) }
+
+
+seq_:
+| TLPA t = term TRPA  { t }
+| TLPA t = term TRPA s = seq_ { TypedTerm.Seq (t, s) }
+
