@@ -25,7 +25,7 @@ let rec print_term_index = function
   | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
 		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
   | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v
-  | Seq (t1, t2) -> Printf.printf "("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
+  | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
 
 let print_term t =
   print_endline "Printing term with name :";
