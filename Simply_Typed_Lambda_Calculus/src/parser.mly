@@ -11,7 +11,7 @@
 %token <string> TWord
 %token TSep (* ; *)
 %token TColon (* : *)
-%token TAssign (* := *)
+(*%token TAssign (* := *)*)
 %token TLPA TRPA (* () *)
 %token TEof
 %right TArrow
@@ -34,7 +34,7 @@ term:
 | abs = abstraction { abs }
 | app = application { app }
 | if_ = ifthenelse  { if_ }
-| assign = assignation { assign }
+(*| assign = assignation { assign }*)
 
 bool_:
 | TTrue  { TypedTerm.True  }
@@ -61,9 +61,9 @@ application:
 ifthenelse:
 | TLPA TIf cond = term TThen true_body = term TElse false_body = term TRPA { TypedTerm.If (cond, true_body, false_body) }
 
-assignation:
+(*assignation:
 | k = TWord TAssign v = term { TypedTerm.Assign (k, v) }
-
+*)
 
 seq_:
 | TLPA t = term TRPA  { t }

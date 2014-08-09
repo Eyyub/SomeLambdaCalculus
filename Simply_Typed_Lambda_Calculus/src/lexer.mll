@@ -15,7 +15,7 @@ rule lexer = parse
   | ')'                { TRPA         }
   | ';'                { TSep         }
   | ':'                { TColon       }
-  | ":="               { TAssign      }
+(*  | ":="               { TAssign      }*)
   | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
   | "if"               { TIf          }
