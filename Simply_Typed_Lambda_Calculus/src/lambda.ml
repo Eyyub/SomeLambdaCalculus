@@ -13,7 +13,6 @@ let rec print_term_name = function
   | If (c, t, f) -> Printf.printf "(if "; print_term_name c; print_string " then "; 
 		    print_term_name t; print_string "else "; print_term_name f; print_string ")"
   | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_name t; Printf.printf " in "; print_term_name t_in; print_string ")" 
-(*  | Assign (k, v) -> Printf.printf "%s := " k; print_term_name v*)
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_name t1; Printf.printf " ; "; print_term_name t2; Printf.printf ")"
 
 let rec print_term_index = function
@@ -26,7 +25,6 @@ let rec print_term_index = function
   | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
 		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
   | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_index t; Printf.printf " in "; print_term_index t_in; print_string ")" 
-(*  | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v*)
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
 
 let print_term t =
@@ -50,7 +48,6 @@ let rec shift c d = function
   | App (t1, t2) -> App (shift c d t1, shift c d t2)
   | If (cond, t, f) -> If (shift c d cond, shift c d t, shift c d f)
   | LetIn (n, t, t_in) -> LetIn (n, shift c d t, shift (succ c) d t_in)
-(*  | Assign _ -> failwith "Assignation in expr.\n"*)
   | Seq (t1, t2) -> Seq (shift c d t1, shift c d t2)
 
 let rec substitution j s t ctx =
@@ -70,7 +67,6 @@ let rec substitution j s t ctx =
 			 substitution j s t' ctx
 		       else substitution j s f ctx
     | LetIn (n, t, t_in) -> LetIn (n, substitution j s t ctx, substitution (succ j) (shift 0 1 s) t_in ctx)
-(*    | Assign _ -> failwith "Assignation in expr.\n"*)
     | Seq (t1, t2) -> Seq (substitution j s t1 ctx, substitution j s t2 ctx)
     | _ -> t
 
@@ -94,7 +90,6 @@ let rec eval' e ctx =
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
-
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
 
 let rec print_context = function
@@ -107,7 +102,6 @@ let rec print_context = function
 let rec eval l ctx =
   match l with
   | [] -> ctx
-(*  | Assign (k, v) :: xs -> eval xs (add_in_naming_context k (to_debruijn_term v ctx) ctx);*)
   | x :: xs -> 
      print_endline "Before evaluation :";
      print_term (to_debruijn_term x ctx);

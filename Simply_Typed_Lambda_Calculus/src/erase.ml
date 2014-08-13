@@ -7,7 +7,6 @@ let rec erase = function
   | TypedTerm.App (t1, t2) -> Term.App (erase t1, erase t2)
   | TypedTerm.If (c, t, f) -> Term.If (erase c, erase t, erase f)
   | TypedTerm.LetIn (n, t, t_in) -> Term.LetIn(n, erase t, erase t_in)
-(*  | TypedTerm.Assign (k, v) -> Term.Assign (k, erase v)*)
   | TypedTerm.Seq (t1, t2) -> Term.Seq (erase t1, erase t2)
 
 let erase_all ty_e =

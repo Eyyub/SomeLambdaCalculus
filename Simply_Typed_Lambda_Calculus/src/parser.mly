@@ -65,10 +65,6 @@ ifthenelse:
 let_in:
 | TLPA TLet n = TWord TAssign t = term TIn t_in = term TRPA { TypedTerm.LetIn(n, t, t_in) }
 
-(*assignation:
-| k = TWord TAssign v = term { TypedTerm.Assign (k, v) }
-*)
-
 seq_:
 | TLPA t = term TRPA  { t }
 | TLPA t = term TRPA s = seq_ { TypedTerm.Seq (t, s) }
