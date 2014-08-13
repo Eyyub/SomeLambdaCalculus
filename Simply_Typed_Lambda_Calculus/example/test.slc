@@ -2,4 +2,8 @@
 #((\x:Bool.(if x then true else false)) false);
 #(((\x:Unit.x) (false) (unit)) unit);
 #(((\x:Bool.x) (unit) (false)) true)
-((\x:Unit. (unit) (true)) unit);
+#((\x:Unit. (unit) (true)) unit);
+#(let x := false in ((\a:Bool.(a)) x));
+#((\x:Bool.(x)) (let f := false in f));
+((let f := false in (\x:Bool.(f))) true);
+#((\x:Bool.(x)) true);

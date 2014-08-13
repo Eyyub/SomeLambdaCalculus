@@ -12,6 +12,7 @@ let rec print_term_name = function
   | App (t1, t2) -> Printf.printf "(("; print_term_name t1; print_term_name t2; print_string ")"
   | If (c, t, f) -> Printf.printf "(if "; print_term_name c; print_string " then "; 
 		    print_term_name t; print_string "else "; print_term_name f; print_string ")"
+  | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_name t; Printf.printf " in "; print_term_name t_in; print_string ")" 
 (*  | Assign (k, v) -> Printf.printf "%s := " k; print_term_name v*)
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_name t1; Printf.printf " ; "; print_term_name t2; Printf.printf ")"
 
@@ -24,6 +25,7 @@ let rec print_term_index = function
   | App (t1, t2) -> Printf.printf "(("; print_term_index t1; print_term_index t2; print_string ")"
   | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
 		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
+  | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_name t; Printf.printf " in "; print_term_name t_in; print_string ")" 
 (*  | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v*)
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
 
@@ -47,12 +49,13 @@ let rec shift c d = function
   | Abs (x, t) -> Abs (x, (shift (succ c) d t))
   | App (t1, t2) -> App (shift c d t1, shift c d t2)
   | If (cond, t, f) -> If (shift c d cond, shift c d t, shift c d f)
+  | LetIn (n, t, t_in) -> LetIn (n, shift c d t, shift (succ c) d t_in)
 (*  | Assign _ -> failwith "Assignation in expr.\n"*)
   | Seq (t1, t2) -> Seq (shift c d t1, shift c d t2)
 
 let rec substitution j s t ctx =
     match t with
-    | Var (z, k) ->
+    | Var (_, k) ->
         if k > j then
 	  let t' = 
 	    (try
@@ -66,6 +69,7 @@ let rec substitution j s t ctx =
     | If (c, t', f) -> if substitution j s c ctx = True then 
 			 substitution j s t' ctx
 		       else substitution j s f ctx
+    | LetIn (n, t, t_in) -> LetIn (n, substitution j s t ctx, substitution (succ j) (shift 0 1 s) t_in ctx)
 (*    | Assign _ -> failwith "Assignation in expr.\n"*)
     | Seq (t1, t2) -> Seq (substitution j s t1 ctx, substitution j s t2 ctx)
     | _ -> t
@@ -76,17 +80,21 @@ let beta_reduction s t ctx =
   (shift 0 (-1) beta_redex)
 
 let rec eval' e ctx =
-  let e  = 
+  let e = 
     match e with
     | App (Var (_, k), t2) -> App (find_index k 0 ctx, t2)
     | App (t1, Var (_, k)) -> App (t1, find_index k 0 ctx)
     | _ -> e
   in
     match e with
+    | App (LetIn (_, Var (n, k), t_in), t) -> 
+         eval' (App (beta_reduction t_in (Var (n, k)) ctx, t)) ctx
+    | App (LetIn (n, t, t_in), t2) -> 
+         eval' (App (eval' t_in (add_in_naming_context n t ctx), t2)) ctx
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
-    | _ -> (match e with Seq _ -> print_string "seq\n" | _ -> ()); raise (NoRuleApplies e) (* No Rule Applies *)
+    | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
 
 let rec print_context = function
   | [] -> print_string "End of ctx.\n"

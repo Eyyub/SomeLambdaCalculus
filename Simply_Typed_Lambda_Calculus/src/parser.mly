@@ -11,7 +11,7 @@
 %token <string> TWord
 %token TSep (* ; *)
 %token TColon (* : *)
-(*%token TAssign (* := *)*)
+%token TLet TAssign TIn (* let n := t in t_in *)
 %token TLPA TRPA (* () *)
 %token TEof
 %right TArrow
@@ -34,6 +34,7 @@ term:
 | abs = abstraction { abs }
 | app = application { app }
 | if_ = ifthenelse  { if_ }
+| li  = let_in      { li  }
 (*| assign = assignation { assign }*)
 
 bool_:
@@ -60,6 +61,9 @@ application:
 
 ifthenelse:
 | TLPA TIf cond = term TThen true_body = term TElse false_body = term TRPA { TypedTerm.If (cond, true_body, false_body) }
+
+let_in:
+| TLPA TLet n = TWord TAssign t = term TIn t_in = term TRPA { TypedTerm.LetIn(n, t, t_in) }
 
 (*assignation:
 | k = TWord TAssign v = term { TypedTerm.Assign (k, v) }

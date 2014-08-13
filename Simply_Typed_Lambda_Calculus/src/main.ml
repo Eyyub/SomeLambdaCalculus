@@ -6,4 +6,5 @@ let _ =
   let e = Erase.erase_all ty_e in 
   print_endline "Begin evaluation :";
   ignore (Lambda.eval e []);
+  (*Lambda.print_term (List.hd e);*)
   print_endline "End of evaluation."

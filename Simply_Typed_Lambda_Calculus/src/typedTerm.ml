@@ -10,6 +10,7 @@ type ty_term =
   | Abs    of (string * ty) * ty_term
   | App    of ty_term * ty_term
   | If     of ty_term * ty_term * ty_term
+  | LetIn  of string * ty_term * ty_term
 (*  | Assign of string * ty_term*)
   | Seq    of ty_term * ty_term
 
@@ -33,6 +34,7 @@ let rec typeof ctx = function
 	  raise (TypingError "If-bodys must have the same type T.")
 	else ty_t)
      else raise (TypingError "If condition must have type Bool.")
+  | LetIn (_, t, t_in) -> typeof (typeof ctx t :: ctx) t_in
 (*  | Assign _ -> failwith "Error : assign in expr. (typeof)"*)
   | Seq (t1, t2) -> 
     if typeof ctx t1 = TyUnit then typeof ctx t2

@@ -15,12 +15,14 @@ rule lexer = parse
   | ')'                { TRPA         }
   | ';'                { TSep         }
   | ':'                { TColon       }
-(*  | ":="               { TAssign      }*)
+  | ":="               { TAssign      }
   | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
   | "if"               { TIf          }
   | "then"             { TThen        }
   | "else"             { TElse        }
+  | "let"              { TLet         }
+  | "in"               { TIn          }
   | "Bool"             { TBool        }
   | "true"             { TTrue        }
   | "false"            { TFalse       }

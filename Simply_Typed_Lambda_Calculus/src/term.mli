@@ -6,5 +6,6 @@ type term =
   | Abs    of (string * term)
   | App    of term * term
   | If     of term * term * term
+  | LetIn  of string * term * term
 (*  | Assign of string * term*)
   | Seq    of term * term
