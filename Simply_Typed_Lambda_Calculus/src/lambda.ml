@@ -25,7 +25,7 @@ let rec print_term_index = function
   | App (t1, t2) -> Printf.printf "(("; print_term_index t1; print_term_index t2; print_string ")"
   | If (c, t, f) -> Printf.printf "(if "; print_term_index c; print_string " then "; 
 		    print_term_index t; print_string "else "; print_term_index f; print_string ")"
-  | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_name t; Printf.printf " in "; print_term_name t_in; print_string ")" 
+  | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_index t; Printf.printf " in "; print_term_index t_in; print_string ")" 
 (*  | Assign (k, v) -> Printf.printf "%s := " k; print_term_index v*)
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
 
@@ -87,13 +87,14 @@ let rec eval' e ctx =
     | _ -> e
   in
     match e with
-    | App (LetIn (_, Var (n, k), t_in), t) -> 
-         eval' (App (beta_reduction t_in (Var (n, k)) ctx, t)) ctx
-    | App (LetIn (n, t, t_in), t2) -> 
-         eval' (App (eval' t_in (add_in_naming_context n t ctx), t2)) ctx
+    | LetIn (_, Var (n, k), t_in) -> (* is it the right way ? *)
+        eval' (beta_reduction t_in (Var (n, k)) ctx) ctx
+    | LetIn (n, t, t_in) -> 
+        eval' t_in (add_in_naming_context n t ctx)
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
+
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
 
 let rec print_context = function
