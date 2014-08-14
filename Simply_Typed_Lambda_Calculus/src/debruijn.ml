@@ -41,4 +41,5 @@ let find_name_index name ctx =
     | If (c, t, f) -> If (aux depth inner_ctx c, aux depth inner_ctx t, aux depth inner_ctx f)
     | LetIn (n, t, t_in) -> LetIn (n, aux depth inner_ctx t, aux (succ depth) (n :: inner_ctx) t_in)
     | Seq (t1, t2) -> Seq (aux depth inner_ctx t1, aux depth inner_ctx t2)
+    | Tuple l -> Tuple (List.map (aux depth inner_ctx) l)
   in aux 0 [] t

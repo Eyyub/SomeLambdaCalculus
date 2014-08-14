@@ -12,6 +12,7 @@ type ty_term =
   | If     of ty_term * ty_term * ty_term
   | LetIn  of string * ty_term * ty_term
   | Seq    of ty_term * ty_term
+  | Tuple  of ty_term list
 
 let rec typeof ctx = function
   | True | False -> TyBool
@@ -24,7 +25,7 @@ let rec typeof ctx = function
      let ty1, ty2 = typeof ctx t1, typeof ctx t2 in
      (match ty1 with
      | TyArrow (p, r) -> (* Type checking *)
-	if p = ty2 then r else raise (TypingError "Type mismatch.")
+	if p = ty2 then r else raise (TypingError ("Type mismatch, expected " ^ string_of_ty p ^ " instead of " ^ string_of_ty ty2 ^ "."))
      | _ -> raise (TypingError "Type Arrow expected."))
   | If (c, t, f) ->
      if typeof ctx c = TyBool then
@@ -37,6 +38,7 @@ let rec typeof ctx = function
   | Seq (t1, t2) -> 
     if typeof ctx t1 = TyUnit then typeof ctx t2
     else raise (TypingError "Left seq side must have type unit.")
+  | Tuple l -> TyTuple (List.map (typeof ctx) l)
 
 let rec typecheck_ty_terms ctx = function
   | [] -> ()

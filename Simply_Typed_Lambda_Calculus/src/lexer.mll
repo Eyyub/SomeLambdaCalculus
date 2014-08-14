@@ -5,6 +5,8 @@
 
 let alpha = ['a' - 'z' 'A'- 'Z']
 let word = alpha+
+let digit = ['0' - '9']
+let number = digit+
 let empty = [' ' '\t' '\n']
 
 rule lexer = parse
@@ -13,11 +15,14 @@ rule lexer = parse
   | empty+             { lexer lexbuf }
   | '('                { TLPA         }
   | ')'                { TRPA         }
+  | '{'                { TLCB         }
+  | '}'                { TRCB         }
   | ';'                { TSep         }
   | ':'                { TColon       }
   | ":="               { TAssign      }
   | "\\" | "λ"         { TLambda      }
   | '.'                { TDot         }
+  | ','                { TComma       }
   | "if"               { TIf          }
   | "then"             { TThen        }
   | "else"             { TElse        }
@@ -29,5 +34,7 @@ rule lexer = parse
   | "Unit"             { TTyUnit      }
   | "unit"             { TValUnit     }
   | "->"               { TArrow       }
+(*  | "*"                { TStar        }*)
   | word as w          { TWord w      }
+  | number as n        { TNumber (int_of_string n)}
   | _ as err           { raise (LexingError ("Unkown character \'" ^ Char.escaped err ^ "\'.\n")) }

@@ -8,3 +8,4 @@ type term =
   | If     of term * term * term
   | LetIn  of string * term * term
   | Seq    of term * term
+  | Tuple  of term list

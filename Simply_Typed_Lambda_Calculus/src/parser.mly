@@ -7,21 +7,30 @@
 %token TIf TThen TElse (* if <bool> then <T> else <T> *)
 %token TBool TTrue TFalse (* Bool : true | false*)
 %token TTyUnit TValUnit (* Unit : unit *)
-%token TArrow (* -> *)
+%token TArrow (* -> *) 
+(*%token TStar (* * *)*)
 %token <string> TWord
+%token <int> TNumber
 %token TSep (* ; *)
 %token TColon (* : *)
 %token TLet TAssign TIn (* let n := t in t_in *)
 %token TLPA TRPA (* () *)
+%token TLCB TRCB (* {} *)
+%token TComma (* , *)
 %token TEof
 %right TArrow
 
+
 %start <TypedTerm.ty_term list> prgm
+%start <Type.ty> ty
 
 %%
 
 prgm:
 | s = sequence TEof { s }
+
+ty:
+| t = type_ TEof { t }
 
 sequence:
 | t = term TSep { [t] }
@@ -30,11 +39,14 @@ sequence:
 term:
 | b   = bool_       { b   }
 | u   = unit_       { u   }
+| tup = tuple       { tup }
+(*| pro = projection  { pro }*)
 | var = variable    { var }
 | abs = abstraction { abs }
 | app = application { app }
 | if_ = ifthenelse  { if_ }
 | li  = let_in      { li  }
+
 (*| assign = assignation { assign }*)
 
 bool_:
@@ -44,6 +56,13 @@ bool_:
 unit_:
 | TValUnit { TypedTerm.Unit }
 
+tuple:
+| TLCB t = tup_seq TRCB { TypedTerm.Tuple t}
+
+tup_seq:
+| t1 = term TComma t2 = term  { [t1; t2] }
+| t = term TComma s = tup_seq { t :: s }
+ 
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
 
@@ -55,6 +74,13 @@ type_:
 | TBool { Type.TyBool }
 | TTyUnit { Type.TyUnit }
 | ty1 = type_ TArrow ty2 = type_ { Type.TyArrow (ty1, ty2) }
+| TLCB tup = type_seq TRCB { Type.TyTuple tup }
+
+type_seq:
+| ty = type_ { [ty] }
+| ty = type_ TComma tyseq = type_seq { ty :: tyseq }
+
+(*| th = type_ TComma tl = type_ { Type.TyBool (*Tuple (th :: tl :: [])*) }*)
 
 application:
 | TLPA t1 = term t2 = term TRPA { TypedTerm.App (t1, t2) }

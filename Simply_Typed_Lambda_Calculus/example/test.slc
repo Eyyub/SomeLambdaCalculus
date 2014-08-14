@@ -1,11 +1,14 @@
 #((\x:Bool->Bool->Bool.x) (\y:Bool.(\w:Bool.(\a:Bool.false)))); type mismatch
-((\x:Bool.((if x then true else false))) false);
+#((\x:Bool.((if x then true else false))) false);
 #(((\x:Unit.x) (false) (unit)) unit);
 #(((\x:Bool.x) (unit) (false)) true)
 #((\x:Unit. (unit) (true)) unit);
 #(let x := false in ((\a:Bool.(a)) x));
 #((\x:Bool.(x)) (let f := false in f));;
 #((\x:Bool.(x)) true);
-#((let foo := false in (let k := foo in (\x:Bool.(x)))) true);
+#((let bar := unit in (let foo := false in (let k := bar in (\x:Bool.(bar))))) true);
 #((\x:Bool.((\y:Bool.(x)))) true);
 #(if false then true else false);
+#(\y:Bool.((\x:Unit.(y))));
+((\x:{{Bool, Bool}, Bool, Unit}.(x)) {{true, (if false then true else false)}, false, (if true then unit else unit)});
+#(if true then ((unit) (true)) else false);
