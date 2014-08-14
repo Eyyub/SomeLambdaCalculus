@@ -63,9 +63,9 @@ let rec substitution j s t ctx =
 	else t
     | Abs (x, t1) -> Abs (x, (substitution (succ j) (shift 0 1 s) t1 ctx))
     | App (t1, t2) -> App (substitution j s t1 ctx, substitution j s t2 ctx)
-    | If (c, t', f) -> if substitution j s c ctx = True then (* change here *)
+    | If (c, t', f) -> (*if substitution j s c ctx = True then (* change here *)
 			 substitution j s t' ctx
-		       else substitution j s f ctx
+		       else substitution j s f ctx*) If (substitution j s c ctx, substitution j s t' ctx, substitution j s f ctx)
     | LetIn (n, t, t_in) -> LetIn (n, substitution j s t ctx, substitution (succ j) (shift 0 1 s) t_in ctx)
     | Seq (t1, t2) -> Seq (substitution j s t1 ctx, substitution j s t2 ctx)
     | _ -> t
@@ -89,6 +89,9 @@ let rec eval' e ctx =
     | LetIn (n, t, t_in) ->
       let t' = eval' t ctx in
       eval' (beta_reduction t' t_in ctx) ctx
+    | If (c, t', f) -> if eval' c ctx = True then (* change here *)
+			 eval' t' ctx
+		       else eval' f ctx
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
