@@ -63,7 +63,7 @@ let rec substitution j s t ctx =
 	else t
     | Abs (x, t1) -> Abs (x, (substitution (succ j) (shift 0 1 s) t1 ctx))
     | App (t1, t2) -> App (substitution j s t1 ctx, substitution j s t2 ctx)
-    | If (c, t', f) -> if substitution j s c ctx = True then 
+    | If (c, t', f) -> if substitution j s c ctx = True then (* change here *)
 			 substitution j s t' ctx
 		       else substitution j s f ctx
     | LetIn (n, t, t_in) -> LetIn (n, substitution j s t ctx, substitution (succ j) (shift 0 1 s) t_in ctx)
@@ -82,15 +82,18 @@ let rec eval' e ctx =
     | App (t1, Var (_, k)) -> App (t1, find_index k 0 ctx)
     | _ -> e
   in
+  let eval'' e ctx = 
     match e with
     | LetIn (_, Var (n, k), t_in) -> (* is it the right way ? *)
-        eval' (beta_reduction t_in (Var (n, k)) ctx) ctx
-    | LetIn (n, t, t_in) -> 
-        eval' t_in (add_in_naming_context n t ctx)
+        eval' (beta_reduction (Var (n, k)) t_in ctx) ctx
+    | LetIn (n, t, t_in) ->
+      let t' = eval' t ctx in
+      eval' (beta_reduction t' t_in ctx) ctx
     | App (t1, t2) when not (isval t1) -> eval' (App (eval' t1 ctx, t2)) ctx
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
+  in (try eval'' e ctx with NoRuleApplies e -> e)
 
 let rec print_context = function
   | [] -> print_string "End of ctx.\n"
