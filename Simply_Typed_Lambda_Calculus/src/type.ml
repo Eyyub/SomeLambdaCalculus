@@ -18,6 +18,7 @@ let rec string_of_ty = function
   | TyBool -> "Bool"
   | TyUnit -> "Unit"
   | TyArrow (l, r) -> (string_of_ty l) ^  " -> " ^ (string_of_ty r)
+  | TyTuple [] -> "{}"
   | TyTuple (l) -> 
     let buf = Buffer.create 128 in
       let x, xs = List.hd l, List.tl l in

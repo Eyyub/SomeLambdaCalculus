@@ -57,6 +57,7 @@ unit_:
 | TValUnit { TypedTerm.Unit }
 
 tuple:
+| TLCB TRCB { TypedTerm.Tuple [] }
 | TLCB t = tup_seq TRCB { TypedTerm.Tuple t}
 
 tup_seq:
@@ -78,6 +79,7 @@ type_:
 | TTyUnit { Type.TyUnit }
 | ty1 = type_ TArrow ty2 = type_ { Type.TyArrow (ty1, ty2) }
 | TLCB tup = type_seq TRCB { Type.TyTuple tup }
+| TLCB TRCB { Type.TyTuple [] }
 
 type_seq:
 | ty = type_ { [ty] }

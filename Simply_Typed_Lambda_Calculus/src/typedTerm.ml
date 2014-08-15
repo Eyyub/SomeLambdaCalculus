@@ -42,6 +42,7 @@ let rec typeof ctx = function
   | Tuple l -> TyTuple (List.map (typeof ctx) l)
   | Proj (t, n) ->
     match t, typeof ctx t with 
+    | Tuple [], _ -> raise (TypingError "Can't project on empty tuple")
     | Tuple l, TyTuple lt -> 
         if n >= 0 &&  List.length lt < n then raise (TypingError (string_of_ty (TyTuple lt) ^ " is a " ^ string_of_int (List.length lt) ^ "-tuple, can't project at index " ^ string_of_int n ^ "."))
 	else typeof ctx (List.nth l n)
