@@ -65,7 +65,7 @@ tup_seq:
 | t = term TComma s = tup_seq { t :: s }
 
 projection:
-| t = term TDot n = TNumber { TypedTerm.Proj (t, n) }
+| t = tuple TDot n = TNumber { TypedTerm.Proj (t, n) }
 
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
