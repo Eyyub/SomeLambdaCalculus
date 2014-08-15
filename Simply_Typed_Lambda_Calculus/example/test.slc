@@ -10,5 +10,6 @@
 #((\x:Bool.((\y:Bool.(x)))) true);
 #(if false then true else false);
 #(\y:Bool.((\x:Unit.(y))));
-((\x:{{Bool, Bool}, Bool, Unit}.(x)) {{true, (if false then true else false)}, false, (if true then unit else unit)});
+#((\x:{{Bool, Bool}, Bool, Unit}.(x)) {{true, (if false then true else false)}, false, (if true then unit else unit)});
 #(if true then ((unit) (true)) else false);
+((\x:{Bool, Bool}.(x)) {{true, (if false then true else false)}, false, (if true then unit else unit)}.0);

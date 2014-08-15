@@ -13,6 +13,7 @@ type ty_term =
   | LetIn  of string * ty_term * ty_term
   | Seq    of ty_term * ty_term
   | Tuple  of ty_term list
+  | Proj   of ty_term * int
 
 let rec typeof ctx = function
   | True | False -> TyBool
@@ -39,6 +40,12 @@ let rec typeof ctx = function
     if typeof ctx t1 = TyUnit then typeof ctx t2
     else raise (TypingError "Left seq side must have type unit.")
   | Tuple l -> TyTuple (List.map (typeof ctx) l)
+  | Proj (t, n) ->
+    match t, typeof ctx t with 
+    | Tuple l, TyTuple lt -> 
+        if n >= 0 &&  List.length lt < n then raise (TypingError (string_of_ty (TyTuple lt) ^ " is a " ^ string_of_int (List.length lt) ^ "-tuple, can't project at index " ^ string_of_int n ^ "."))
+	else typeof ctx (List.nth l n)
+    | _ -> raise (TypingError "Can only project on tuple type.")
 
 let rec typecheck_ty_terms ctx = function
   | [] -> ()

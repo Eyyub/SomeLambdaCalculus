@@ -40,7 +40,7 @@ term:
 | b   = bool_       { b   }
 | u   = unit_       { u   }
 | tup = tuple       { tup }
-(*| pro = projection  { pro }*)
+| pro = projection  { pro }
 | var = variable    { var }
 | abs = abstraction { abs }
 | app = application { app }
@@ -62,7 +62,10 @@ tuple:
 tup_seq:
 | t1 = term TComma t2 = term  { [t1; t2] }
 | t = term TComma s = tup_seq { t :: s }
- 
+
+projection:
+| t = term TDot n = TNumber { TypedTerm.Proj (t, n) }
+
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
 

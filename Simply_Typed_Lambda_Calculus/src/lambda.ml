@@ -15,6 +15,7 @@ let rec print_term_name = function
   | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_name t; Printf.printf " in "; print_term_name t_in; print_string ")" 
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_name t1; Printf.printf " ; "; print_term_name t2; Printf.printf ")"
   | Tuple l -> Printf.printf "{"; List.iter (fun x -> print_term_name x; print_string ", ") l; Printf.printf "}"
+  | Proj (t, n) -> Printf.printf "("; print_term_name t; print_string "."; print_int n; Printf.printf ")"
 
 let rec print_term_index = function
   | True -> Printf.printf "(true)"
@@ -28,6 +29,7 @@ let rec print_term_index = function
   | LetIn (n, t, t_in) -> Printf.printf "(let %s := " n; print_term_index t; Printf.printf " in "; print_term_index t_in; print_string ")" 
   | Seq (t1, t2) -> Printf.printf "[seq]\n("; print_term_index t1; Printf.printf " ; "; print_term_index t2; Printf.printf ")"
   | Tuple l -> Printf.printf "{"; List.iter (fun x -> print_term_index x; print_string ", ") l; Printf.printf "}"
+  | Proj (t, n) -> Printf.printf "("; print_term_index t; print_string "."; print_int n; Printf.printf ")"
 
 let print_term t =
   print_endline "Printing term with name :";
@@ -38,7 +40,7 @@ let print_term t =
   print_endline "\n=========End============="
   
 let isval = function
-  | Abs _ | Tuple _ | True | False | Unit -> true
+  | Abs _ | Tuple _ | Proj _ | True | False | Unit -> true
   | _ -> false
 
 let rec shift c d = function
@@ -52,6 +54,7 @@ let rec shift c d = function
   | LetIn (n, t, t_in) -> LetIn (n, shift c d t, shift (succ c) d t_in)
   | Seq (t1, t2) -> Seq (shift c d t1, shift c d t2)
   | Tuple l -> Tuple (List.map (shift c d) l)
+  | Proj (t, n) -> Proj (shift c d t, n)
 
 let rec substitution j s t ctx =
     match t with
@@ -71,6 +74,7 @@ let rec substitution j s t ctx =
          LetIn (n, substitution j s t ctx, substitution (succ j) (shift 0 1 s) t_in ctx)
     | Seq (t1, t2) -> Seq (substitution j s t1 ctx, substitution j s t2 ctx)
     | Tuple l -> Tuple (List.map (fun x -> substitution j s x ctx) l)
+    | Proj (t, n) -> Proj (substitution j s t ctx, n)
     | _ -> t
 
 let beta_reduction s t ctx =
@@ -101,6 +105,7 @@ let rec eval' e ctx = (* this function is now very ugly :D *)
     | App (v1, t2) when not (isval t2) -> eval' (App (v1, eval' t2 ctx)) ctx
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
     | Tuple l -> Tuple (List.map (fun x -> eval' x ctx) l)
+    | Proj (Tuple l, n) -> eval' (List.nth l n) ctx
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
   in (try eval'' e ctx with NoRuleApplies e -> e)
 
