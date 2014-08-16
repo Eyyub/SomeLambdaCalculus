@@ -9,6 +9,7 @@ let rec erase = function
   | TypedTerm.LetIn (n, t, t_in) -> Term.LetIn(n, erase t, erase t_in)
   | TypedTerm.Seq (t1, t2) -> Term.Seq (erase t1, erase t2)
   | TypedTerm.Tuple l -> Term.Tuple (List.map erase l)
+  | TypedTerm.Record l -> Term.Record (List.map (fun (f, v) -> f, erase v) l)
   | TypedTerm.Proj (t, n) -> Term.Proj (erase t, n) (* obliger de matcher sur un tuple en sachant qu'apres le typechercking on sait que c'est obligatoirement un tuple ... *) 
 
 let erase_all ty_e =

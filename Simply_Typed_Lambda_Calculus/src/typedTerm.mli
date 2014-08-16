@@ -13,6 +13,7 @@ type ty_term =
   | LetIn  of string * ty_term * ty_term
   | Seq    of ty_term * ty_term
   | Tuple  of ty_term list
+  | Record of (string * ty_term) list
   | Proj   of ty_term * int
 
 val typecheck_ty_terms : ty_context -> ty_term list -> unit

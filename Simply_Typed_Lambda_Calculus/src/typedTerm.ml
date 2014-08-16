@@ -13,6 +13,7 @@ type ty_term =
   | LetIn  of string * ty_term * ty_term
   | Seq    of ty_term * ty_term
   | Tuple  of ty_term list
+  | Record of (string * ty_term) list
   | Proj   of ty_term * int
 
 let rec typeof ctx = function
@@ -40,6 +41,7 @@ let rec typeof ctx = function
     if typeof ctx t1 = TyUnit then typeof ctx t2
     else raise (TypingError "Left seq side must have type unit.")
   | Tuple l -> TyTuple (List.map (typeof ctx) l)
+  | Record l -> TyRecord (List.map (fun (f, v) -> f, typeof ctx v) l)
   | Proj (t, n) ->
     match  t, typeof ctx t with 
     | Tuple [], _ -> raise (TypingError "Can't project on empty tuple")

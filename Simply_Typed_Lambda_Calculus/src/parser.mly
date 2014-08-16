@@ -40,6 +40,7 @@ term:
 | b   = bool_       { b   }
 | u   = unit_       { u   }
 | tup = tuple       { tup }
+| rcd = record      { rcd }
 | pro = projection  { pro }
 | var = variable    { var }
 | abs = abstraction { abs }
@@ -61,11 +62,18 @@ tuple:
 | TLCB t = tup_seq TRCB { TypedTerm.Tuple t}
 
 tup_seq:
-| t1 = term TComma t2 = term  { [t1; t2] }
+| t = term { [t] }
 | t = term TComma s = tup_seq { t :: s }
 
+record:
+| TLCB t = rcd_seq TRCB { TypedTerm.Record t}
+
+rcd_seq:
+| f = TWord TAssign t = term { [(f, t)] }
+| f = TWord TAssign t = term TComma s = rcd_seq { (f, t) :: s }
+
 projection:
-| t = tuple TDot n = TNumber { TypedTerm.Proj (t, n) }
+| t = term TDot n = TNumber { TypedTerm.Proj (t, n) }
 
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }
@@ -79,11 +87,16 @@ type_:
 | TTyUnit { Type.TyUnit }
 | ty1 = type_ TArrow ty2 = type_ { Type.TyArrow (ty1, ty2) }
 | TLCB tup = type_seq TRCB { Type.TyTuple tup }
+| TLCB rcd = rcd_type_seq TRCB { Type.TyRecord rcd }
 | TLCB TRCB { Type.TyTuple [] }
 
 type_seq:
 | ty = type_ { [ty] }
 | ty = type_ TComma tyseq = type_seq { ty :: tyseq }
+
+rcd_type_seq:
+| f = TWord TAssign ty = type_ { [(f, ty)] }
+| f = TWord TAssign ty = type_ TComma tyseq = rcd_type_seq { (f, ty) :: tyseq }
 
 (*| th = type_ TComma tl = type_ { Type.TyBool (*Tuple (th :: tl :: [])*) }*)
 

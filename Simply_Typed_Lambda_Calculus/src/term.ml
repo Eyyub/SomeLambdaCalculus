@@ -9,4 +9,5 @@ type term =
   | LetIn  of string * term * term
   | Seq    of term * term
   | Tuple  of term list
+  | Record of (string * term) list
   | Proj   of term * int
