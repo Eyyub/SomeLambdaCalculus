@@ -14,4 +14,5 @@
 #(if true then ((unit) (true)) else false);
 #((\x:{Bool, Bool}.(x)) {{true, (if false then true else false)}, false, (if true then unit else unit)}.0);
 #((\x:Unit.(x)) {true, {false, {true, unit}}}.1.1.1);
-((\x:{foo:=Bool, bar:=Unit}.(x)) {foo:=(if false then true else false), bar:=false});
+#((\x:{foo:=Bool, bar:=Unit}.(x)) {foo:=(if false then true else false), bar:=false});
+((\x:Bool.(x)) {unit, {foo:={false, unit}, baz:=unit}}.1.foo.0);

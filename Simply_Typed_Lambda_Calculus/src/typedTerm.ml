@@ -14,7 +14,7 @@ type ty_term =
   | Seq    of ty_term * ty_term
   | Tuple  of ty_term list
   | Record of (string * ty_term) list
-  | Proj   of ty_term * int
+  | Proj   of ty_term * string
 
 let rec typeof ctx = function
   | True | False -> TyBool
@@ -45,11 +45,14 @@ let rec typeof ctx = function
   | Proj (t, n) ->
     match  t, typeof ctx t with 
     | Tuple [], _ -> raise (TypingError "Can't project on empty tuple")
-    | Proj _, TyTuple lt -> List.nth lt n 
-    | Tuple l, TyTuple lt -> 
+    | Proj _, TyTuple lt -> List.nth lt (int_of_string n)
+    | Proj _, TyRecord lt -> List.assoc n lt
+    | Tuple l, TyTuple lt -> let n = int_of_string n in
         if n >= 0 &&  List.length lt <= n then raise (TypingError (string_of_ty (TyTuple lt) ^ " is a " ^ string_of_int (List.length lt) ^ "-tuple, can't project at index " ^ string_of_int n ^ "."))
 	else typeof ctx (List.nth l n)
-    | _ -> raise (TypingError "Can only project on tuple type.")
+    | _, TyRecord lt ->
+        (try List.assoc n lt with Not_found -> raise (TypingError (n ^ " is not a member of " ^ string_of_ty (TyRecord lt) ^ ".")))
+    | _ -> raise (TypingError "Can only project on tuple or record type.")
 
 let rec typecheck_ty_terms ctx = function
   | [] -> ()

@@ -2,8 +2,8 @@ type ty =
   | TyBool (* Bool : true of false *)
   | TyUnit (* Unit : unit *) 
   | TyArrow of ty * ty (* Arrow : T->T *)
-  | TyTuple of ty list (* Product : T * T *)
-  | TyRecord of (string * ty) list
+  | TyTuple of ty list (* Product : {T, T, T} *)
+  | TyRecord of (string * ty) list (* Record : {f := T, b := T, fb := T} *)
 
 type ty_context = ty list
 

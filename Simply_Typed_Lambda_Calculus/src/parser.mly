@@ -73,7 +73,8 @@ rcd_seq:
 | f = TWord TAssign t = term TComma s = rcd_seq { (f, t) :: s }
 
 projection:
-| t = term TDot n = TNumber { TypedTerm.Proj (t, n) }
+| t = term TDot n = TNumber { TypedTerm.Proj (t, string_of_int n) }
+| t = term TDot n = TWord   { TypedTerm.Proj (t, n) }
 
 variable:
 | v = TWord { TypedTerm.Var (v, 0) }

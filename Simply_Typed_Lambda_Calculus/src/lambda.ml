@@ -18,7 +18,7 @@ let rec print_term_name = function
   | Record l ->
     let (f, x), xs = List.hd l, List.tl l in
       print_string "{"; Printf.printf "%s := " f; print_term_name x; List.iter (fun (f, v) -> print_string ", "; Printf.printf "%s := " f ; print_term_name v) xs; print_string "}"
-  | Proj (t, n) -> Printf.printf "("; print_term_name t; print_string "."; print_int n; Printf.printf ")"
+  | Proj (t, n) -> Printf.printf "("; print_term_name t; print_string "."; print_string n; Printf.printf ")"
 
 let rec print_term_index = function
   | True -> Printf.printf "(true)"
@@ -35,7 +35,7 @@ let rec print_term_index = function
   | Record l ->
     let (f, x), xs = List.hd l, List.tl l in
       print_string "{"; Printf.printf "%s := " f; print_term_index x; List.iter (fun (f, v) -> print_string ", "; Printf.printf "%s := " f ; print_term_index v) xs; print_string "}"
-  | Proj (t, n) -> Printf.printf "("; print_term_index t; print_string "."; print_int n; Printf.printf ")"
+  | Proj (t, n) -> Printf.printf "("; print_term_index t; print_string "."; print_string n; Printf.printf ")"
 
 let print_term t =
   print_endline "Printing term with name :";
@@ -113,7 +113,8 @@ let rec eval' e ctx = (* this function is now very ugly :D *)
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
     | Tuple l -> Tuple (List.map (fun x -> eval' x ctx) l)
     | Record l -> Record (List.map (fun (f, x) -> f, eval' x ctx) l)
-    | Proj (Tuple l, n) -> eval' (List.nth l n) ctx
+    | Proj (Tuple l, n) -> eval' (List.nth l (int_of_string n)) ctx
+    | Proj (Record l, n) -> eval' (List.assoc n l) ctx
     | Proj (t, n) -> eval' (Proj (eval' t ctx, n)) ctx
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
   in (try eval'' e ctx with NoRuleApplies e -> e)

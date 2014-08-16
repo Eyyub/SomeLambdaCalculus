@@ -10,4 +10,4 @@ type term =
   | Seq    of term * term
   | Tuple  of term list
   | Record of (string * term) list
-  | Proj   of term * int
+  | Proj   of term * string
