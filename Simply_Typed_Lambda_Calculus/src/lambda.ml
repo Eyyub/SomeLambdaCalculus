@@ -106,6 +106,7 @@ let rec eval' e ctx = (* this function is now very ugly :D *)
     | App (Abs (_, t), s) when isval s -> eval' (beta_reduction s t ctx) ctx
     | Tuple l -> Tuple (List.map (fun x -> eval' x ctx) l)
     | Proj (Tuple l, n) -> eval' (List.nth l n) ctx
+    | Proj (t, n) -> eval' (Proj (eval' t ctx, n)) ctx
     | _ -> raise (NoRuleApplies e) (* No Rule Applies *)
   in (try eval'' e ctx with NoRuleApplies e -> e)
 

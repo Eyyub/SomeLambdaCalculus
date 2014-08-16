@@ -41,10 +41,11 @@ let rec typeof ctx = function
     else raise (TypingError "Left seq side must have type unit.")
   | Tuple l -> TyTuple (List.map (typeof ctx) l)
   | Proj (t, n) ->
-    match t, typeof ctx t with 
+    match  t, typeof ctx t with 
     | Tuple [], _ -> raise (TypingError "Can't project on empty tuple")
+    | Proj _, TyTuple lt -> List.nth lt n 
     | Tuple l, TyTuple lt -> 
-        if n >= 0 &&  List.length lt < n then raise (TypingError (string_of_ty (TyTuple lt) ^ " is a " ^ string_of_int (List.length lt) ^ "-tuple, can't project at index " ^ string_of_int n ^ "."))
+        if n >= 0 &&  List.length lt <= n then raise (TypingError (string_of_ty (TyTuple lt) ^ " is a " ^ string_of_int (List.length lt) ^ "-tuple, can't project at index " ^ string_of_int n ^ "."))
 	else typeof ctx (List.nth l n)
     | _ -> raise (TypingError "Can only project on tuple type.")
 
